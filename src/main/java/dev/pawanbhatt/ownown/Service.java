@@ -22,6 +22,7 @@ public class Service {
         return ping(address);
     }
 
+    // Todo : Persist the URLs added by user.
     public ResponseEntity<String> ping(String url){
 //        thread = new Thread(() -> {
             while (true) {
