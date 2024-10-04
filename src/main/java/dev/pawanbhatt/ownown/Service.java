@@ -17,6 +17,8 @@ public class Service {
 
     public static final Logger LOGGER= LoggerFactory.getLogger(Service.class);
 
+    // TODO : Make the User Server's URL persist when re-deployed
+
     @Autowired
     Dao dao;
 
@@ -30,10 +32,12 @@ public class Service {
 //        thread = new Thread(() -> {
             while (true) {
                 try {
-                    RestTemplate restTemplate = new RestTemplate();
-                    dao.setData(Objects.requireNonNull(restTemplate.getForObject(url, String.class)).toString());
                     LOGGER.info(url);
-                    Thread.sleep(2000);
+                    RestTemplate restTemplate = new RestTemplate();
+                    Object userServerResponse = Objects.requireNonNull(restTemplate.getForObject(url, Object.class));
+                    dao.setData(userServerResponse.toString());
+                    LOGGER.info("Server Response : {}", userServerResponse);
+                    Thread.sleep(10000);
                 } catch (Exception error) {
                     LOGGER.error(error.getMessage());
                     Thread.currentThread().interrupt();
