@@ -34,7 +34,7 @@ public class Service {
                 try {
                     LOGGER.info(url);
                     RestTemplate restTemplate = new RestTemplate();
-                    Object userServerResponse = Objects.requireNonNull(restTemplate.getForObject(url, Object.class));
+                    Object userServerResponse = restTemplate.getForObject(url, Object.class);
                     dao.setData(userServerResponse.toString());
                     LOGGER.info("Server Response : {}", userServerResponse);
                     Thread.sleep(10000);
