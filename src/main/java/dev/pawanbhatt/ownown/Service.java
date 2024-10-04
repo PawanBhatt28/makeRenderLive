@@ -47,4 +47,9 @@ public class Service {
 //        thread.start();
 //        return new ResponseEntity<>( "Cannot send request", HttpStatus.BAD_REQUEST);
     }
+
+    @PostConstruct
+    public ResponseEntity<String> pingThyself() throws InterruptedException {
+        return pingYourself("https://makerenderlive.onrender.com/backend/server-health");
+    }
 }
