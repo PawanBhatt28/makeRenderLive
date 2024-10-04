@@ -6,7 +6,7 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
 
-COPY --from=build /target/ownown-0.0.1-SNAPSHOT.jar-SNAPSHOT.jar application.jar
+COPY --from=build /target/ownown-0.0.1-SNAPSHOT.jar application.jar
 
 EXPOSE 8080
 
