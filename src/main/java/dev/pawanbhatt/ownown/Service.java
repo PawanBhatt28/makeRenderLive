@@ -17,39 +17,45 @@ public class Service {
 
     public static final Logger LOGGER= LoggerFactory.getLogger(Service.class);
 
-    // TODO : Make the User Server's URL persist when re-deployed
-
     @Autowired
     Dao dao;
 
     public Thread thread;
+    private boolean stopThread = false;
 
     public ResponseEntity<String>  pingYourself(String address) throws InterruptedException {
         return ping(address);
     }
 
     public ResponseEntity<String> ping(String url){
-//        thread = new Thread(() -> {
-            while (true) {
-                try {
-                    LOGGER.info(url);
-                    RestTemplate restTemplate = new RestTemplate();
-                    Object userServerResponse = restTemplate.getForObject(url, Object.class);
-                    dao.setData(userServerResponse.toString());
-                    LOGGER.info("Server Response : {}", userServerResponse);
-                    Thread.sleep(10000);
-                } catch (Exception error) {
-                    LOGGER.error(error.getMessage());
-                    Thread.currentThread().interrupt();
+        if (thread == null || !thread.isAlive()) {
+            thread = new Thread(() -> {
+                while (!stopThread) {
+                    try {
+                        RestTemplate restTemplate = new RestTemplate();
+                        String response = restTemplate.getForObject(url, String.class);
+                        if (response != null) {
+                            dao.setData(response);
+                            LOGGER.info("Response from {}: {}", url, response);
+                        } else {
+                            LOGGER.warn("Received null response from {}", url);
+                        }
+                        Thread.sleep(2000);
+                    } catch (Exception error) {
+                        LOGGER.error("Error pinging {}: {}", url, error.getMessage());
+                        break;
+                    }
                 }
-            }
-        //        };
-//        thread.start();
-//        return new ResponseEntity<>( "Cannot send request", HttpStatus.BAD_REQUEST);
+            });
+            thread.start(); // Start the thread
+        }
+        return new ResponseEntity<>("Ping started", HttpStatus.OK);
     }
 
-    @PostConstruct
-    public ResponseEntity<String> pingThyself() throws InterruptedException {
-        return pingYourself("https://makerenderlive.onrender.com/backend/server-health");
+    public void stopPinging() {
+        stopThread = true;
+        if (thread != null && thread.isAlive()) {
+            thread.interrupt();
+        }
     }
 }
